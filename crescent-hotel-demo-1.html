@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hotel and restaurant management demo | Crescent Code</title>
+<meta name="description" content="A working demo of a hotel and restaurant management system by Crescent Code, Indore.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#EDF0F2; --surface:#FFFFFF; --ink:#13222B; --muted:#566772; --line:#D3DBE1;
+  --deep:#0F3B40; --brand:#0F3B40; --brand-on:#FFFFFF;
+  --accent:#C8963E; --accent-on:#2A1C03; --accent-text:#8A5F12;
+  --danger:#B8452F; --ok:#2B7F5E;
+  --c-direct:#0F3B40; --c-direct-on:#FFFFFF;
+  --c-mmt:#C8963E; --c-mmt-on:#2A1C03;
+  --c-bkg:#456CA3; --c-bkg-on:#FFFFFF;
+  --c-walk:#7B5E9B; --c-walk-on:#FFFFFF;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    color-scheme:dark;
+    --bg:#0B171B; --surface:#112126; --ink:#E6EDF0; --muted:#98A9B2; --line:#243A42;
+    --deep:#0E2C31; --brand:#1F7A83; --brand-on:#FFFFFF;
+    --accent:#D4A24A; --accent-on:#241702; --accent-text:#E0B462;
+    --danger:#E0745E; --ok:#4FB58D;
+    --c-direct:#1F7A83; --c-direct-on:#FFFFFF;
+    --c-mmt:#D4A24A; --c-mmt-on:#241702;
+    --c-bkg:#4F77B5; --c-bkg-on:#FFFFFF;
+    --c-walk:#A98CC8; --c-walk-on:#1B1226;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Bricolage Grotesque','Manrope',system-ui,sans-serif;margin:0;letter-spacing:-.02em;line-height:1.1}
+button,select,input{font:inherit;color:inherit}
+a{color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.muted{color:var(--muted)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.logo{display:flex;align-items:center;gap:10px;font:800 1.2rem 'Bricolage Grotesque',sans-serif;text-decoration:none;color:var(--ink)}
+.nav{display:none;gap:24px}
+.nav a{color:var(--muted);text-decoration:none;font-weight:600;font-size:.95rem}
+.nav a:hover{color:var(--ink)}
+@media(min-width:760px){.nav{display:flex}}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;border:1px solid transparent;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;text-decoration:none;background:var(--brand);color:var(--brand-on)}
+.btn:hover{filter:brightness(1.12)}
+.btn.accent{background:var(--accent);color:var(--accent-on)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--ink);filter:none}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* hero */
+.hero{position:relative;padding:36px 0 34px}
+.hero .moon{position:absolute;right:-30px;top:-10px;width:min(380px,60vw);opacity:.08;pointer-events:none;color:var(--brand)}
+.hero h1{font-size:clamp(2.4rem,5.6vw,4.2rem);font-weight:800;max-width:15ch;position:relative}
+.hero p{max-width:58ch;color:var(--muted);font-size:1.08rem;margin:18px 0 0;position:relative}
+.hero .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;position:relative}
+
+/* console */
+.console{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 28px 60px -34px rgba(15,59,64,.55)}
+.c-top{background:var(--deep);color:#fff;padding:16px 20px;display:flex;flex-wrap:wrap;gap:16px 30px;align-items:center;justify-content:space-between}
+.prop label{display:block;font-size:.78rem;opacity:.75}
+.prop select{background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.4);font:700 1.3rem 'Bricolage Grotesque',sans-serif;color:#fff;padding:2px 4px 2px 0;max-width:100%;cursor:pointer}
+.prop select option{color:#13222B;background:#fff}
+.stats{display:flex;gap:26px;flex-wrap:wrap}
+.stat b{display:block;font:700 1.4rem/1.1 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums}
+.stat span{font-size:.8rem;opacity:.8}
+.c-body{display:grid;grid-template-columns:minmax(0,1fr)}
+@media(min-width:1000px){.c-body{grid-template-columns:minmax(0,1fr) 330px}}
+.tape-wrap{padding:16px;overflow-x:auto}
+.tape{display:grid;grid-template-columns:92px repeat(14,minmax(52px,1fr));grid-template-rows:52px;grid-auto-rows:46px;min-width:830px}
+.th{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.76rem;color:var(--muted);border-bottom:1px solid var(--line)}
+.th b{font:700 1rem 'Bricolage Grotesque',sans-serif;color:var(--ink)}
+.th.we{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.th.today{box-shadow:inset 0 -3px 0 var(--accent)}
+.th.corner{grid-column:1;grid-row:1;align-items:flex-start;justify-content:flex-end;padding:0 0 6px 4px}
+.rowline{grid-column:1/-1;border-bottom:1px solid var(--line);pointer-events:none}
+.rl{grid-column:1;display:flex;flex-direction:column;justify-content:center;padding-left:4px}
+.rl b{font:700 1rem 'Bricolage Grotesque',sans-serif;line-height:1.1}
+.rl span{font-size:.74rem;color:var(--muted)}
+.cell{border:0;border-left:1px solid var(--line);background:transparent;cursor:pointer;padding:0;border-radius:0}
+.cell:hover{background:color-mix(in srgb,var(--brand) 14%,transparent)}
+.cell.sel{background:color-mix(in srgb,var(--accent) 40%,transparent);box-shadow:inset 0 0 0 2px var(--accent)}
+.cell:focus-visible,.bar:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.bar{margin:5px 2px;border:0;border-radius:9px;padding:0 9px;text-align:left;display:flex;flex-direction:column;justify-content:center;overflow:hidden;cursor:pointer;color:var(--on)}
+.bar b{font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.bar small{font-size:.7rem;opacity:.85;white-space:nowrap}
+.c-direct{background:var(--c-direct);--on:var(--c-direct-on)}
+.c-mmt{background:var(--c-mmt);--on:var(--c-mmt-on)}
+.c-bkg{background:var(--c-bkg);--on:var(--c-bkg-on)}
+.c-walk{background:var(--c-walk);--on:var(--c-walk-on)}
+.bar.clipL{border-top-left-radius:0;border-bottom-left-radius:0;margin-left:0}
+.bar.clipR{border-top-right-radius:0;border-bottom-right-radius:0;margin-right:0}
+.bar.out{opacity:.4}
+.bar.view{outline:3px solid var(--ink);outline-offset:1px}
+.tape.intro .bar{animation:grow .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*45ms);transform-origin:left center}
+@keyframes grow{from{transform:scaleX(0);opacity:0}}
+@media(prefers-reduced-motion:reduce){.tape.intro .bar{animation:none}html{scroll-behavior:auto}}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;font-size:.82rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:12px;height:12px;border-radius:4px}
+
+.side{border-top:1px solid var(--line);padding:20px;background:color-mix(in srgb,var(--bg) 55%,var(--surface))}
+@media(min-width:1000px){.side{border-top:0;border-left:1px solid var(--line)}}
+.side h3{font-size:1.2rem;margin-bottom:6px}
+.side p{margin:4px 0;font-size:.92rem}
+.field{display:block;margin-top:14px}
+.field span{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+.field input,.field select,.send input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 12px;font-size:.9rem;color:var(--muted)}
+.total b{font:700 1.6rem 'Bricolage Grotesque',sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.row-actions{display:grid;gap:8px;margin-top:16px}
+.err{color:var(--danger);font-size:.85rem;min-height:1.3em;margin-top:6px}
+.dl{margin:14px 0 0}
+.dl div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0;font-weight:700;text-align:right}
+
+/* sections */
+.sec{padding:76px 0 0}
+.sec h2{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:800;max-width:22ch}
+.sec .sub{color:var(--muted);max-width:60ch;margin:12px 0 0}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-top:26px}
+.tabs button{background:none;border:0;padding:12px 16px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.mod{background:var(--surface);border:1px solid var(--line);border-top:0;border-radius:0 0 16px 16px;padding:22px;min-height:380px}
+.mod h3{font-size:1.2rem;margin-bottom:4px}
+.mod .note{color:var(--muted);margin:0 0 16px;max-width:62ch;font-size:.95rem}
+.cols{display:grid;gap:30px}
+@media(min-width:800px){.cols{grid-template-columns:1fr 1fr}}
+.li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:0}
+.li small{display:block;color:var(--muted)}
+.empty{color:var(--muted);padding:12px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:99px;background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.chip.ok{color:var(--ok)}
+.chip.warn{color:var(--accent-text)}
+.chip.bad{color:var(--danger)}
+.btn.sm{padding:7px 12px;font-size:.88rem}
+
+.hk{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:14px}
+.tile{text-align:left;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface);cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.tile b{font:700 1.5rem 'Bricolage Grotesque',sans-serif}
+.tile span{font-size:.82rem;color:var(--muted)}
+.tile em{font-style:normal;font-size:.85rem;font-weight:700;margin-top:6px}
+.tile.dirty{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 9%,var(--surface))}
+.tile.dirty em{color:var(--danger)}
+.tile.cleaning{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface))}
+.tile.cleaning em{color:var(--accent-text)}
+.tile.ready{border-color:var(--ok);cursor:default}
+.tile.ready em{color:var(--ok)}
+.tile.occupied{background:color-mix(in srgb,var(--brand) 13%,var(--surface));cursor:default}
+
+.pos{display:grid;gap:26px}
+@media(min-width:900px){.pos{grid-template-columns:1.25fr 1fr 1fr}}
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.dish{text-align:left;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);cursor:pointer}
+.dish:hover{border-color:var(--brand)}
+.dish b{display:block;font-size:.88rem;line-height:1.25;margin-bottom:2px}
+.dish span{font-size:.85rem;color:var(--muted)}
+.vd{display:inline-block;width:11px;height:11px;border:1.5px solid var(--ok);border-radius:2px;position:relative;margin-right:6px;vertical-align:-1px}
+.vd::after{content:'';position:absolute;inset:2px;border-radius:50%;background:var(--ok)}
+.vd.nv{border-color:var(--danger)}
+.vd.nv::after{background:var(--danger)}
+.qty{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.qty button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:800}
+.bill{font-variant-numeric:tabular-nums;margin:12px 0}
+.bill div{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted);font-size:.92rem}
+.bill .g{color:var(--ink);font-weight:800;font-size:1.1rem;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+.kot{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;font-size:.92rem}
+.kot header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px}
+.kot ul{margin:0 0 10px;padding-left:18px;color:var(--muted)}
+
+.sw{display:flex;align-items:center;gap:10px;background:none;border:0;padding:6px 0;cursor:pointer;text-align:left;font-weight:600}
+.sw i{width:42px;height:24px;border-radius:99px;background:var(--line);position:relative;flex:none;transition:background .2s}
+.sw i::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw[aria-checked=true] i{background:var(--brand)}
+.sw[aria-checked=true] i::after{transform:translateX(18px)}
+.rate-ctl{display:flex;flex-wrap:wrap;gap:8px 28px;align-items:center;margin-bottom:6px}
+.chartbox{overflow-x:auto}
+.chart{display:grid;grid-template-columns:repeat(14,minmax(38px,1fr));gap:6px;align-items:end;min-width:580px;margin-top:16px}
+.col{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.plot{height:130px;display:flex;align-items:flex-end;width:100%}
+.col .fill{width:100%;border-radius:6px 6px 0 0;background:color-mix(in srgb,var(--brand) 55%,var(--surface));min-height:5px;transition:height .35s}
+.col.we .fill{background:var(--accent)}
+.col b{color:var(--ink);font-size:.76rem}
+.col.today b{color:var(--accent-text)}
+.chart-cap{font-size:.85rem;color:var(--muted);margin-top:10px}
+
+.chat{max-width:640px}
+.log{height:290px;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px}
+.msg{max-width:86%;padding:10px 14px;border-radius:16px;font-size:.95rem}
+.msg.bot{background:color-mix(in srgb,var(--ink) 8%,transparent);border-bottom-left-radius:4px;align-self:flex-start}
+.msg.me{background:var(--brand);color:var(--brand-on);border-bottom-right-radius:4px;align-self:flex-end}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.quick button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 13px;font-size:.85rem;cursor:pointer}
+.quick button:hover{border-color:var(--ink)}
+.send{display:flex;gap:8px}
+
+.svc-grid{display:grid;gap:30px;margin-top:0}
+@media(min-width:900px){.svc-grid{grid-template-columns:.8fr 1.2fr;gap:60px}}
+details.svc{border-top:1px solid var(--line)}
+details.svc:last-of-type{border-bottom:1px solid var(--line)}
+details.svc summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:20px 0;font:700 1.35rem 'Bricolage Grotesque',sans-serif}
+details.svc summary::-webkit-details-marker{display:none}
+details.svc summary::after{content:'+';font-size:1.7rem;color:var(--accent-text);transition:transform .2s;line-height:1}
+details.svc[open] summary::after{transform:rotate(45deg)}
+.svc .body{padding:0 0 22px;max-width:60ch;color:var(--muted)}
+.svc .body p{margin:0 0 8px}
+.svc .body strong{color:var(--ink)}
+
+.roi{display:grid;gap:30px;background:var(--deep);color:#fff;border-radius:20px;padding:28px}
+@media(min-width:900px){.roi{grid-template-columns:1fr 1fr;padding:44px;gap:56px}}
+.roi h2{max-width:none}
+.sl{margin:18px 0}
+.sl div{display:flex;justify-content:space-between;font-size:.92rem;margin-bottom:4px}
+.sl output{font-weight:800;font-variant-numeric:tabular-nums}
+.roi input[type=range]{width:100%;accent-color:var(--accent)}
+.out big{display:block;font:800 clamp(2.4rem,5.4vw,3.6rem)/1 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums;margin:6px 0 4px}
+.out ul{list-style:none;padding:0;margin:16px 0 0}
+.out li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(255,255,255,.2);font-size:.95rem;font-variant-numeric:tabular-nums}
+.fine{font-size:.8rem;opacity:.78;margin-top:14px}
+
+.cta{display:grid;gap:26px;border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:28px}
+@media(min-width:900px){.cta{grid-template-columns:1fr 1fr;padding:44px;gap:56px}}
+.cta h2{max-width:16ch}
+.ok-msg{color:var(--ok);font-weight:700;margin-top:12px;min-height:1.4em}
+footer{padding:44px 0 56px;color:var(--muted);font-size:.9rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer a{color:var(--ink);font-weight:700}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:50;max-width:92vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="https://crescentcode.edsolutionhub.com/" aria-label="Crescent Code home">
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><path d="M21 4a12 12 0 1 0 0 24 14 14 0 0 1 0-24z" fill="var(--accent)"/></svg>
+      Crescent Code
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#console">Booking chart</a>
+      <a href="#modules">Modules</a>
+      <a href="#services">Services</a>
+      <a href="#roi">Savings</a>
+    </nav>
+    <a class="btn accent" href="#contact">Book a demo</a>
+  </header>
+
+  <section class="hero">
+    <svg class="moon" viewBox="0 0 32 32" aria-hidden="true"><path d="M21 4a12 12 0 1 0 0 24 14 14 0 0 1 0-24z" fill="currentColor"/></svg>
+    <h1>One screen for every room, table and guest.</h1>
+    <p>This is a working demo of the hotel and restaurant system Crescent Code builds in Indore. Click a free night to make a booking, check the guest in, charge dinner to their room and watch the numbers change.</p>
+    <div class="acts">
+      <a class="btn" href="#console">Try the booking chart</a>
+      <a class="btn ghost" href="#contact">Get this for my hotel</a>
+    </div>
+  </section>
+
+  <section id="console" aria-label="Booking chart demo">
+    <div class="console">
+      <div class="c-top">
+        <div class="prop">
+          <label for="prop">Property</label>
+          <select id="prop">
+            <option>Hotel Aurelia (demo)</option>
+            <option>Hotel Regal Regency</option>
+            <option>Hotel Trivana</option>
+            <option>Hotel O BR Greens</option>
+          </select>
+        </div>
+        <div class="stats" id="stats" aria-live="polite"></div>
+      </div>
+      <div class="c-body">
+        <div class="tape-wrap">
+          <div class="tape intro" id="tape" role="group" aria-label="Room availability for the next 14 nights"></div>
+          <div class="legend">
+            <span><i style="background:var(--c-direct)"></i>Direct</span>
+            <span><i style="background:var(--c-mmt)"></i>MakeMyTrip</span>
+            <span><i style="background:var(--c-bkg)"></i>Booking.com</span>
+            <span><i style="background:var(--c-walk)"></i>Walk-in</span>
+          </div>
+        </div>
+        <aside class="side" id="side" aria-live="polite"></aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="modules">
+    <h2>The rest of the hotel runs from the same data.</h2>
+    <p class="sub">Check a guest out at the front desk and the room lands in housekeeping. Charge dinner to a room in the restaurant tab and it shows on that guest's booking.</p>
+    <div class="tabs" role="tablist" aria-label="Modules" id="tabs">
+      <button role="tab" id="t-fd" aria-selected="true" aria-controls="mod" data-tab="fd">Front desk</button>
+      <button role="tab" id="t-hk" aria-selected="false" aria-controls="mod" data-tab="hk">Housekeeping</button>
+      <button role="tab" id="t-pos" aria-selected="false" aria-controls="mod" data-tab="pos">Restaurant</button>
+      <button role="tab" id="t-rate" aria-selected="false" aria-controls="mod" data-tab="rate">Rates</button>
+      <button role="tab" id="t-ai" aria-selected="false" aria-controls="mod" data-tab="ai">Guest assistant</button>
+    </div>
+    <div class="mod" id="mod" role="tabpanel"></div>
+  </section>
+
+  <section class="sec" id="services">
+    <div class="svc-grid">
+      <div>
+        <h2>What we build around the system.</h2>
+        <p class="sub">Crescent Code is a software studio in Indore. These five services power the demo above, and we offer them separately or together.</p>
+      </div>
+      <div>
+        <details class="svc" name="svc" open>
+          <summary>Guest CRM</summary>
+          <div class="body"><p>Every guest gets one profile with past stays, preferences, spend and WhatsApp history. Birthday wishes, repeat-guest offers and review requests send themselves.</p><p><strong>In this demo:</strong> open any booking on the chart to see the guest's stay and charges.</p></div>
+        </details>
+        <details class="svc" name="svc">
+          <summary>Booking engine</summary>
+          <div class="body"><p>A booking page on your own domain with live availability and UPI or card payments. Direct bookings skip OTA commission and land on the chart instantly.</p><p><strong>In this demo:</strong> bookings you make on the chart are marked Direct, Walk-in or by channel.</p></div>
+        </details>
+        <details class="svc" name="svc">
+          <summary>AI agents</summary>
+          <div class="body"><p>An assistant on WhatsApp and your website answers questions on rates, availability and policies, takes bookings, and hands over to your staff when a guest needs a person.</p><p><strong>In this demo:</strong> try the guest assistant tab.</p></div>
+        </details>
+        <details class="svc" name="svc">
+          <summary>Workflow automation</summary>
+          <div class="body"><p>Check-out sends the room to housekeeping. Low stock raises a purchase request. A pending payment sends a reminder. Your team sets the rules without code.</p><p><strong>In this demo:</strong> check a guest out in the front desk tab and watch housekeeping.</p></div>
+        </details>
+        <details class="svc" name="svc">
+          <summary>Custom business software</summary>
+          <div class="body"><p>Banquet and event booking, multi-property reports, GST and Tally exports, staff rosters or anything specific to your property. Built and supported from Indore.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="roi">
+    <div class="roi">
+      <div>
+        <h2>What it could be worth to your hotel.</h2>
+        <p style="opacity:.85;max-width:44ch">Move the sliders to match your property. The estimate shows what a month could recover from OTA commission and booking errors.</p>
+        <div class="sl"><div><label for="r-rooms">Rooms</label><output id="o-rooms"></output></div><input type="range" id="r-rooms" min="10" max="150" step="1" value="40"></div>
+        <div class="sl"><div><label for="r-adr">Average room rate per night</label><output id="o-adr"></output></div><input type="range" id="r-adr" min="1500" max="10000" step="100" value="3500"></div>
+        <div class="sl"><div><label for="r-occ">Occupancy</label><output id="o-occ"></output></div><input type="range" id="r-occ" min="30" max="95" step="1" value="62"></div>
+        <div class="sl"><div><label for="r-ota">Share of bookings from OTAs</label><output id="o-ota"></output></div><input type="range" id="r-ota" min="10" max="90" step="1" value="65"></div>
+      </div>
+      <div class="out" aria-live="polite">
+        <span>Estimated recovery each month</span>
+        <big id="roi-total"></big>
+        <ul>
+          <li><span>Room revenue each month</span><b id="roi-rev"></b></li>
+          <li><span>Paid to OTAs each month</span><b id="roi-comm"></b></li>
+          <li><span>Saved by moving bookings to direct</span><b id="roi-direct"></b></li>
+          <li><span>Recovered from no-shows and double-bookings</span><b id="roi-err"></b></li>
+        </ul>
+        <p class="fine">Illustrative only. We assume an 18% average OTA commission, 15 percentage points of bookings moving to direct, and 1.5% of room revenue lost to booking errors. We replace these with your real numbers in the demo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="contact">
+    <div class="cta">
+      <div>
+        <h2>See it with your hotel's name and rooms.</h2>
+        <p class="sub">Tell us about the property. We set up this demo with your room types, rates and menu before the call.</p>
+        <p class="sub"><a href="https://crescentcode.edsolutionhub.com/">crescentcode.edsolutionhub.com</a></p>
+      </div>
+      <div>
+        <label class="field"><span>Your name</span><input id="c-name" autocomplete="name"></label>
+        <label class="field"><span>Hotel or restaurant name</span><input id="c-hotel" autocomplete="organization"></label>
+        <label class="field"><span>WhatsApp number</span><input id="c-phone" inputmode="tel" autocomplete="tel"></label>
+        <div class="err" id="c-err" role="alert"></div>
+        <button class="btn accent" id="c-send" type="button">Request a demo</button>
+        <div class="ok-msg" id="c-ok" role="status"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Crescent Code, Indore. Demo data only.</span>
+    <a href="https://crescentcode.edsolutionhub.com/">Visit crescentcode.edsolutionhub.com</a>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s);
+const inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DAYS=14;
+const today=new Date();today.setHours(0,0,0,0);
+const dayDate=d=>{const x=new Date(today);x.setDate(x.getDate()+d);return x};
+const fmtD=d=>dayDate(d).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+
+/* ---------- data ---------- */
+const TYPES={Deluxe:3200,Superior:4200,Suite:6800};
+const ROOMS=[
+  {no:101,type:'Deluxe'},{no:102,type:'Deluxe'},{no:103,type:'Deluxe'},
+  {no:201,type:'Superior'},{no:202,type:'Superior'},{no:203,type:'Superior'},
+  {no:301,type:'Suite'},{no:302,type:'Suite'}
+];
+const CH={direct:{name:'Direct'},mmt:{name:'MakeMyTrip'},bkg:{name:'Booking.com'},walk:{name:'Walk-in'}};
+const STATUS={expected:'Arriving',inhouse:'In house',out:'Checked out'};
+const MENU=[
+  {id:'m1',name:'Indori poha and jalebi',price:140,veg:1},
+  {id:'m2',name:'Paneer tikka',price:320,veg:1},
+  {id:'m3',name:'Butter chicken',price:460,veg:0},
+  {id:'m4',name:'Dal makhani',price:340,veg:1},
+  {id:'m5',name:'Garlic naan',price:70,veg:1},
+  {id:'m6',name:'Jeera rice',price:180,veg:1},
+  {id:'m7',name:'Jalebi with rabdi',price:160,veg:1},
+  {id:'m8',name:'Masala chai',price:60,veg:1},
+  {id:'m9',name:'Fresh lime soda',price:110,veg:1}
+];
+
+let nextId=1;
+const B=[];
+function seed(room,start,nights,guest,ch,status){
+  B.push({id:nextId++,room,start,nights,guest,ch,status,total:TYPES[ROOMS[room].type]*nights});
+}
+seed(0,-2,4,'Rahul Verma','direct','inhouse');
+seed(0,3,2,'Neha Joshi','mmt','expected');
+seed(0,7,3,'Anil Kapoor','bkg','expected');
+seed(1,0,3,'Priya Sharma','mmt','expected');
+seed(1,5,4,'Dev Malhotra','direct','expected');
+seed(2,-1,5,'Karan Mehta','bkg','inhouse');
+seed(2,8,2,'Isha Trivedi','direct','expected');
+seed(3,0,2,'Sunita Rao','direct','expected');
+seed(3,4,3,'Gaurav Saxena','mmt','expected');
+seed(3,10,3,'Pooja Nair','bkg','expected');
+seed(4,-3,3,'Vikram Singh','mmt','inhouse');
+seed(4,2,5,'Meera Iyer','direct','expected');
+seed(5,1,3,'Arjun Patel','bkg','expected');
+seed(5,6,2,'Zoya Khan','mmt','expected');
+seed(6,-2,2,'Dr. S. Khanna','direct','inhouse');
+seed(6,2,4,'Ritu and Sameer Jain','direct','expected');
+seed(6,9,3,'Harsh Bhatia','bkg','expected');
+seed(7,0,2,'Farhan Qureshi','walk','inhouse');
+seed(7,4,3,'Tanvi Deshmukh','mmt','expected');
+
+const hk={101:'ready',102:'ready',103:'dirty',201:'ready',202:'ready',203:'cleaning',301:'ready',302:'ready'};
+
+let propName='Hotel Aurelia (demo)';
+let sel=null, viewId=null, cancelArm=null, tab='fd';
+let eventOn=true, autoSync=true, rateType='Deluxe';
+let cart={}, dest='T1', kots=[], kotN=1; const folio={};
+let msgs=[];
+
+/* ---------- helpers ---------- */
+const bookedAt=(r,d)=>B.find(b=>b.room===r&&d>=b.start&&d<b.start+b.nights);
+const rangeFree=(r,a,b)=>{for(let d=a;d<=b;d++)if(bookedAt(r,d))return false;return true};
+const occ=d=>ROOMS.filter((_,i)=>bookedAt(i,d)).length/ROOMS.length;
+function factor(d){
+  const w=dayDate(d).getDay();
+  let f=0.88+occ(d)*0.55;
+  if(eventOn&&(w===5||w===6||w===0))f+=0.12;
+  return f;
+}
+const rateFor=(type,d)=>Math.round(TYPES[type]*factor(d)/50)*50;
+
+let toastT;
+function toast(msg){
+  const t=$('#toast');t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600);
+}
+
+/* ---------- stats ---------- */
+function renderStats(){
+  const tonight=ROOMS.filter((_,i)=>bookedAt(i,0)).length;
+  let n7=0;for(let d=0;d<7;d++)n7+=ROOMS.filter((_,i)=>bookedAt(i,d)).length;
+  const o7=Math.round(n7/(7*ROOMS.length)*100);
+  const arr=B.filter(b=>b.start===0).length;
+  const rev=B.reduce((s,b)=>s+b.total,0);
+  $('#stats').innerHTML=
+    `<div class="stat"><b>${tonight} of ${ROOMS.length}</b><span>Rooms booked tonight</span></div>`+
+    `<div class="stat"><b>${o7}%</b><span>Occupancy, next 7 nights</span></div>`+
+    `<div class="stat"><b>${arr}</b><span>Arrivals today</span></div>`+
+    `<div class="stat"><b>${inr(rev)}</b><span>Booked revenue</span></div>`;
+}
+
+/* ---------- tape chart ---------- */
+function renderTape(){
+  let h='<div class="th corner">Room</div>';
+  for(let d=0;d<DAYS;d++){
+    const dt=dayDate(d),w=dt.getDay();
+    h+=`<div class="th${w===0||w===6?' we':''}${d===0?' today':''}" style="grid-column:${d+2};grid-row:1"><span>${dt.toLocaleDateString('en-IN',{weekday:'short'})}</span><b>${dt.getDate()}</b></div>`;
+  }
+  ROOMS.forEach((r,i)=>{h+=`<div class="rowline" style="grid-row:${i+2}"></div>`});
+  ROOMS.forEach((r,i)=>{h+=`<div class="rl" style="grid-row:${i+2}"><b>${r.no}</b><span>${r.type}</span></div>`});
+  ROOMS.forEach((r,i)=>{
+    for(let d=0;d<DAYS;d++){
+      if(bookedAt(i,d))continue;
+      const on=sel&&sel.room===i&&d>=sel.a&&d<=sel.b;
+      h+=`<button class="cell${on?' sel':''}" data-r="${i}" data-d="${d}" style="grid-column:${d+2};grid-row:${i+2}" aria-label="Room ${r.no}, ${fmtD(d)}, free"></button>`;
+    }
+  });
+  let n=0;
+  B.forEach(b=>{
+    if(b.start+b.nights<=0||b.start>=DAYS)return;
+    const cs=Math.max(b.start,0),ce=Math.min(b.start+b.nights,DAYS);
+    const first=b.guest.split(' ')[0];
+    h+=`<button class="bar c-${b.ch}${b.status==='out'?' out':''}${viewId===b.id?' view':''}${b.start<0?' clipL':''}${b.start+b.nights>DAYS?' clipR':''}" data-id="${b.id}" style="grid-column:${cs+2}/${ce+2};grid-row:${b.room+2};--i:${n++}" aria-label="${esc(b.guest)}, room ${ROOMS[b.room].no}, ${b.nights} nights"><b>${esc(first)}</b><small>${CH[b.ch].name}</small></button>`;
+  });
+  $('#tape').innerHTML=h;
+}
+
+/* ---------- side panel ---------- */
+function renderSide(){
+  const s=$('#side');
+  if(viewId){
+    const b=B.find(x=>x.id===viewId);
+    if(b){
+      const r=ROOMS[b.room],dep=b.start+b.nights,food=folio[r.no]||0;
+      let act='';
+      if(b.status==='expected'&&b.start<=0)act='<button class="btn" data-a="in">Check in</button>';
+      if(b.status==='inhouse')act='<button class="btn" data-a="out">Check out</button>';
+      s.innerHTML=`<h3>${esc(b.guest)}</h3><p class="muted">Room ${r.no}, ${r.type}</p>
+        <dl class="dl">
+          <div><dt>Stay</dt><dd>${fmtD(b.start)} to ${fmtD(dep)}</dd></div>
+          <div><dt>Nights</dt><dd>${b.nights}</dd></div>
+          <div><dt>Booked through</dt><dd>${CH[b.ch].name}</dd></div>
+          <div><dt>Status</dt><dd>${STATUS[b.status]}</dd></div>
+          <div><dt>Room charges</dt><dd>${inr(b.total)}</dd></div>
+          ${food?`<div><dt>Restaurant charges</dt><dd>${inr(food)}</dd></div>`:''}
+        </dl>
+        <div class="row-actions">${act}
+          <button class="btn ghost" data-a="cancel">${cancelArm===b.id?'Tap again to cancel booking':'Cancel booking'}</button>
+          <button class="btn ghost" data-a="close">Close</button>
+        </div>`;
+      return;
+    }
+    viewId=null;
+  }
+  if(sel){
+    const r=ROOMS[sel.room],n=sel.b-sel.a+1;
+    let tot=0;for(let d=sel.a;d<=sel.b;d++)tot+=rateFor(r.type,d);
+    s.innerHTML=`<h3>New booking</h3>
+      <p><b>Room ${r.no}</b>, ${r.type}</p>
+      <p class="muted">${fmtD(sel.a)} to ${fmtD(sel.b+1)}, ${n} night${n>1?'s':''}</p>
+      <p class="muted">Click another night in this row to extend the stay.</p>
+      <label class="field"><span>Guest name</span><input id="gname" autocomplete="off"></label>
+      <label class="field"><span>Booked through</span><select id="gch">
+        <option value="direct">Direct</option><option value="mmt">MakeMyTrip</option><option value="bkg">Booking.com</option><option value="walk">Walk-in</option></select></label>
+      <div class="err" id="err" role="alert"></div>
+      <div class="total"><span>Total at today's rates</span><b>${inr(tot)}</b></div>
+      <div class="row-actions">
+        <button class="btn accent" data-a="confirm">Confirm booking</button>
+        <button class="btn ghost" data-a="clear">Clear selection</button>
+      </div>`;
+    return;
+  }
+  s.innerHTML=`<h3>Pick a night to book</h3>
+    <p class="muted">Click any free square on the chart. Click a second night in the same row to extend the stay.</p>
+    <p class="muted">Click a coloured bar to open the booking, check the guest in or out, or cancel it.</p>
+    <p class="muted">Rates follow demand. A fuller night costs more, and weekends carry a surcharge.</p>`;
+}
+
+function renderAll(){
+  renderStats();renderTape();renderSide();
+  if(tab!=='ai')renderMod();
+}
+
+function pick(r,d){
+  viewId=null;cancelArm=null;
+  if(sel&&sel.room===r&&sel.a===sel.b&&d===sel.a){sel=null;}
+  else if(sel&&sel.room===r&&sel.a===sel.b&&d!==sel.a){
+    const a=Math.min(sel.a,d),b=Math.max(sel.a,d);
+    if(rangeFree(r,a,b))sel={room:r,a,b};
+    else{sel={room:r,a:d,b:d};toast('Those nights overlap another booking. Starting again from this night.');}
+  }else sel={room:r,a:d,b:d};
+  renderAll();
+  const c=$(`.cell[data-r="${r}"][data-d="${d}"]`);if(c)c.focus();
+}
+
+$('#tape').addEventListener('click',e=>{
+  const c=e.target.closest('.cell');
+  if(c){pick(+c.dataset.r,+c.dataset.d);return;}
+  const b=e.target.closest('.bar');
+  if(b){
+    const id=+b.dataset.id;sel=null;cancelArm=null;
+    viewId=viewId===id?null:id;
+    renderAll();
+    const nb=$(`.bar[data-id="${id}"]`);if(nb)nb.focus();
+  }
+});
+
+$('#side').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-a]');if(!btn)return;
+  const a=btn.dataset.a;
+  if(a==='clear'){sel=null;renderAll();}
+  else if(a==='close'){viewId=null;cancelArm=null;renderAll();}
+  else if(a==='confirm'){
+    const name=$('#gname').value.trim();
+    if(!name){$('#err').textContent='Add a guest name to confirm the booking.';$('#gname').focus();return;}
+    const r=ROOMS[sel.room];let tot=0;
+    for(let d=sel.a;d<=sel.b;d++)tot+=rateFor(r.type,d);
+    const ch=$('#gch').value;
+    const nb={id:nextId++,room:sel.room,start:sel.a,nights:sel.b-sel.a+1,guest:name,ch,status:(ch==='walk'&&sel.a===0)?'inhouse':'expected',total:tot};
+    B.push(nb);sel=null;viewId=nb.id;
+    renderAll();toast(`Booking confirmed: room ${r.no} for ${name}`);
+  }
+  else if(a==='in'||a==='out'){
+    const b=B.find(x=>x.id===viewId);if(!b)return;
+    const r=ROOMS[b.room];
+    if(a==='in'){b.status='inhouse';toast(`Checked in: ${b.guest}, room ${r.no}`);}
+    else{b.status='out';hk[r.no]='dirty';toast(`Checked out: room ${r.no} is now with housekeeping`);}
+    renderAll();
+  }
+  else if(a==='cancel'){
+    if(cancelArm!==viewId){cancelArm=viewId;renderSide();return;}
+    const i=B.findIndex(x=>x.id===viewId);if(i>-1)B.splice(i,1);
+    viewId=null;cancelArm=null;renderAll();toast('Booking cancelled');
+  }
+});
+
+/* ---------- modules ---------- */
+function viewFD(){
+  const arr=B.filter(b=>b.start===0);
+  const dep=B.filter(b=>b.start+b.nights===0);
+  const row=(b,kind)=>{
+    const r=ROOMS[b.room];
+    let right='';
+    if(kind==='arr'){
+      right=b.status==='expected'?`<button class="btn sm" data-fd="in" data-id="${b.id}">Check in</button>`:`<span class="chip ok">In house</span>`;
+    }else{
+      const food=folio[r.no]||0;
+      right=b.status==='inhouse'?`<button class="btn sm" data-fd="out" data-id="${b.id}">Check out</button>`:`<span class="chip">Checked out</span>`;
+      return `<div class="li"><div><b>${esc(b.guest)}</b><small>Room ${r.no}, bill ${inr(b.total+food)}</small></div>${right}</div>`;
+    }
+    return `<div class="li"><div><b>${esc(b.guest)}</b><small>Room ${r.no}, ${CH[b.ch].name}</small></div>${right}</div>`;
+  };
+  return `<p class="note">Today's arrivals and departures come straight from the booking chart. Checking a guest out sends the room to housekeeping.</p>
+  <div class="cols">
+    <div><h3>Arriving today</h3>${arr.length?arr.map(b=>row(b,'arr')).join(''):'<div class="empty">No arrivals today.</div>'}</div>
+    <div><h3>Leaving today</h3>${dep.length?dep.map(b=>row(b,'dep')).join(''):'<div class="empty">No departures today.</div>'}</div>
+  </div>`;
+}
+
+function hkState(i){
+  if(B.some(b=>b.room===i&&b.status==='inhouse'))return 'occupied';
+  return hk[ROOMS[i].no];
+}
+function viewHK(){
+  const st=ROOMS.map((_,i)=>hkState(i));
+  const ready=st.filter(s=>s==='ready').length,need=st.filter(s=>s==='dirty'||s==='cleaning').length;
+  const lab={occupied:'Guest in room',dirty:'Needs cleaning. Tap to start.',cleaning:'Being cleaned. Tap when done.',ready:'Ready to sell'};
+  return `<p class="note">${ready} rooms ready to sell, ${need} waiting on housekeeping. Tap a room to move it along.</p>
+  <div class="hk">${ROOMS.map((r,i)=>`<button class="tile ${st[i]}" data-hk="${i}" ${st[i]==='occupied'||st[i]==='ready'?'disabled':''}><b>${r.no}</b><span>${r.type}</span><em>${lab[st[i]]}</em></button>`).join('')}</div>`;
+}
+
+function viewPOS(){
+  const inh=ROOMS.filter((_,i)=>B.some(b=>b.room===i&&b.status==='inhouse'));
+  const opts=[1,2,3,4,5,6].map(n=>({v:'T'+n,l:'Table '+n})).concat(inh.map(r=>({v:'R'+r.no,l:'Room '+r.no+' (charge to room)'})));
+  if(!opts.some(o=>o.v===dest))dest='T1';
+  const lines=Object.entries(cart).filter(([,q])=>q>0);
+  const sub=lines.reduce((s,[id,q])=>s+MENU.find(m=>m.id===id).price*q,0);
+  const gst=sub*0.05;
+  return `<p class="note">Tap dishes to build an order, pick a table or an in-house room, and send it to the kitchen. Room orders land on the guest's bill.</p>
+  <div class="pos">
+    <div><h3>Menu</h3><div class="menu" style="margin-top:10px">${MENU.map(m=>`<button class="dish" data-add="${m.id}"><b><span class="vd${m.veg?'':' nv'}"></span>${m.name}</b><span>${inr(m.price)}</span></button>`).join('')}</div></div>
+    <div><h3>Order</h3>
+      <label class="field"><span>Serve to</span><select id="dest">${opts.map(o=>`<option value="${o.v}"${o.v===dest?' selected':''}>${o.l}</option>`).join('')}</select></label>
+      <div style="margin-top:8px">${lines.length?lines.map(([id,q])=>{const m=MENU.find(x=>x.id===id);return `<div class="li"><div>${m.name}<small>${inr(m.price*q)}</small></div><div class="qty"><button data-dec="${id}" aria-label="Remove one ${m.name}">-</button><span>${q}</span><button data-add="${id}" aria-label="Add one ${m.name}">+</button></div></div>`}).join(''):'<div class="empty">No dishes yet. Tap a dish to add it.</div>'}</div>
+      <div class="bill"><div><span>Subtotal</span><span>${inr(sub)}</span></div><div><span>GST at 5%</span><span>${inr(gst)}</span></div><div class="g"><span>Total</span><span>${inr(sub+gst)}</span></div></div>
+      <button class="btn accent" data-send ${lines.length?'':'disabled'} style="width:100%">Send to kitchen</button>
+    </div>
+    <div><h3>Kitchen</h3><div style="margin-top:10px">${kots.length?kots.map(k=>`<div class="kot"><header><b>${k.dest[0]==='R'?'Room '+k.dest.slice(1):'Table '+k.dest.slice(1)}, order ${k.id}</b><span class="chip ${k.status==='ready'?'ok':k.status==='cooking'?'warn':''}">${k.status==='new'?'New':k.status==='cooking'?'Cooking':'Ready'}</span></header><ul>${k.items.map(i=>`<li>${i.q} x ${i.n}</li>`).join('')}</ul><button class="btn ghost sm" data-kot="${k.id}">${k.status==='new'?'Start cooking':k.status==='cooking'?'Mark ready':'Mark served'}</button></div>`).join(''):'<div class="empty">Orders sent from the till show up here.</div>'}</div></div>
+  </div>`;
+}
+
+function viewRate(){
+  const base=TYPES[rateType];
+  let sum=0,cols='';
+  for(let d=0;d<DAYS;d++){
+    const r=rateFor(rateType,d);sum+=r;
+    const dt=dayDate(d),w=dt.getDay(),o=Math.round(occ(d)*100);
+    cols+=`<div class="col${w===5||w===6||w===0?' we':''}${d===0?' today':''}"><b>₹${(r/1000).toFixed(1)}k</b><div class="plot"><div class="fill" style="height:${Math.max(4,o)}%" title="${o}% booked"></div></div><span>${dt.toLocaleDateString('en-IN',{weekday:'narrow'})} ${dt.getDate()}</span></div>`;
+  }
+  const avg=sum/DAYS,delta=Math.round((avg/base-1)*100);
+  return `<p class="note">Bar height shows how full the hotel is each night. The label above it is the suggested room rate. Make a booking above and watch the rates move.</p>
+  <div class="rate-ctl">
+    <label class="field" style="margin:0"><span>Room type</span><select id="rtype">${Object.keys(TYPES).map(t=>`<option${t===rateType?' selected':''}>${t}</option>`).join('')}</select></label>
+    <button class="sw" role="switch" aria-checked="${eventOn}" data-sw="event"><i></i>Wedding season surcharge on Fri to Sun</button>
+    <button class="sw" role="switch" aria-checked="${autoSync}" data-sw="sync"><i></i>Push rates to OTAs automatically</button>
+  </div>
+  <div class="chartbox"><div class="chart">${cols}</div></div>
+  <p class="chart-cap">Average ${inr(avg)} a night, ${delta>=0?'+':''}${delta}% against your flat rate of ${inr(base)}. ${autoSync?'Changes go to MakeMyTrip, Booking.com and Goibibo as they happen.':'Automatic sync is off. OTAs keep the last rates you pushed.'}</p>`;
+}
+
+function viewAI(){
+  return `<div class="chat">
+    <p class="note">A preview of the assistant guests meet on WhatsApp and your website. These replies are scripted for the demo. The live version reads your real rates, policies and availability.</p>
+    <div class="log" id="log" tabindex="0" aria-label="Conversation"></div>
+    <div class="quick">
+      <button data-q="Can I get a late checkout?">Can I get a late checkout?</button>
+      <button data-q="Book an airport pickup">Book an airport pickup</button>
+      <button data-q="What veg dinner options do you have?">Veg dinner options</button>
+      <button data-q="Do you have a Deluxe room this weekend?">Deluxe room this weekend</button>
+      <button data-q="I need a GST invoice">I need a GST invoice</button>
+    </div>
+    <div class="send"><input id="aiin" placeholder="Type a message" aria-label="Message"><button class="btn" id="aisend">Send</button></div>
+  </div>`;
+}
+
+const VIEWS={fd:viewFD,hk:viewHK,pos:viewPOS,rate:viewRate,ai:viewAI};
+function renderMod(){
+  $('#mod').innerHTML=VIEWS[tab]();
+  if(tab==='ai'){
+    if(!msgs.length)msgs.push({r:'bot',t:`Namaste. I'm the assistant for ${propName}. Ask me about rooms, late checkout, airport pickups, dinner or your invoice.`});
+    const log=$('#log');log.innerHTML=msgs.map(m=>`<div class="msg ${m.r}">${esc(m.t)}</div>`).join('');log.scrollTop=log.scrollHeight;
+  }
+}
+
+$('#tabs').addEventListener('click',e=>{
+  const b=e.target.closest('[data-tab]');if(!b)return;
+  tab=b.dataset.tab;
+  document.querySelectorAll('#tabs [role=tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
+  renderMod();
+});
+
+$('#mod').addEventListener('click',e=>{
+  const t=e.target;let el;
+  if(el=t.closest('[data-fd]')){
+    const b=B.find(x=>x.id===+el.dataset.id);if(!b)return;
+    const r=ROOMS[b.room];
+    if(el.dataset.fd==='in'){b.status='inhouse';toast(`Checked in: ${b.guest}, room ${r.no}`);}
+    else{b.status='out';hk[r.no]='dirty';toast(`Checked out: room ${r.no} is now with housekeeping`);}
+    renderAll();
+  }
+  else if(el=t.closest('[data-hk]')){
+    const i=+el.dataset.hk,no=ROOMS[i].no;
+    if(hk[no]==='dirty'){hk[no]='cleaning';toast(`Room ${no}: cleaning started`);}
+    else if(hk[no]==='cleaning'){hk[no]='ready';toast(`Room ${no}: ready to sell`);}
+    renderMod();
+  }
+  else if(el=t.closest('[data-add]')){cart[el.dataset.add]=(cart[el.dataset.add]||0)+1;renderMod();}
+  else if(el=t.closest('[data-dec]')){const id=el.dataset.dec;cart[id]=Math.max(0,(cart[id]||0)-1);renderMod();}
+  else if(el=t.closest('[data-send]')){
+    const items=Object.entries(cart).filter(([,q])=>q>0).map(([id,q])=>({n:MENU.find(m=>m.id===id).name,q}));
+    if(!items.length)return;
+    const sub=Object.entries(cart).reduce((s,[id,q])=>s+MENU.find(m=>m.id===id).price*q,0);
+    const total=Math.round(sub*1.05);
+    kots.unshift({id:kotN++,dest,items,status:'new'});
+    if(dest[0]==='R'){const no=+dest.slice(1);folio[no]=(folio[no]||0)+total;toast(`Sent to kitchen: ${inr(total)} charged to room ${no}`);}
+    else toast(`Sent to kitchen: table ${dest.slice(1)}`);
+    cart={};renderAll();
+  }
+  else if(el=t.closest('[data-kot]')){
+    const k=kots.find(x=>x.id===+el.dataset.kot);if(!k)return;
+    if(k.status==='new')k.status='cooking';
+    else if(k.status==='cooking')k.status='ready';
+    else{kots=kots.filter(x=>x!==k);toast('Order served');}
+    renderMod();
+  }
+  else if(el=t.closest('[data-sw]')){
+    if(el.dataset.sw==='event'){eventOn=!eventOn;renderAll();}
+    else{autoSync=!autoSync;renderMod();toast(autoSync?'Rates will sync to OTAs automatically':'Automatic rate sync is off');}
+  }
+  else if(el=t.closest('[data-q]')){ask(el.dataset.q);}
+  else if(t.closest('#aisend')){const i=$('#aiin');if(i.value.trim()){const v=i.value;i.value='';ask(v);}}
+});
+$('#mod').addEventListener('change',e=>{
+  if(e.target.id==='dest')dest=e.target.value;
+  if(e.target.id==='rtype'){rateType=e.target.value;renderMod();}
+});
+$('#mod').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.id==='aiin'){const i=e.target;if(i.value.trim()){const v=i.value;i.value='';ask(v);}}
+});
+
+/* guest assistant (scripted) */
+function answer(q){
+  const s=q.toLowerCase();
+  if(/late|checkout|check-out|check out/.test(s))return 'Standard checkout is 11 am. Room 202 has no arrival today, so I can hold it until 3 pm for ₹600. Shall I add that to your bill?';
+  if(/airport|pickup|pick up|cab|taxi/.test(s))return 'The airport is about 30 minutes away. A sedan is ₹900 and an SUV is ₹1,400. Send me your flight number and I will book the driver.';
+  if(/dinner|food|veg|menu|eat|hungry/.test(s))return 'Tonight\'s vegetarian picks are paneer tikka, dal makhani and jalebi with rabdi. I can send your order to the kitchen and add it to your room bill.';
+  if(/invoice|gst|bill/.test(s))return 'Your GST invoice is ready. Send me the company name and GSTIN and I will reissue it and email the PDF.';
+  if(/wifi|wi-fi|internet/.test(s))return 'The WiFi password is printed on your key card sleeve. If it does not connect, tell me your room number and I will alert the front desk.';
+  if(/room|book|available|availability|price|rate|weekend|stay/.test(s)){
+    let d=0;for(let i=0;i<DAYS;i++){if(dayDate(i).getDay()===6){d=i;break;}}
+    const free=ROOMS.filter((r,i)=>r.type==='Deluxe'&&!bookedAt(i,d)).length;
+    return free?`Yes. A Deluxe room on ${fmtD(d)} is ${inr(rateFor('Deluxe',d))} a night, and ${free} ${free>1?'are':'is'} still free. Want me to hold one for 15 minutes?`:`Deluxe rooms are full on ${fmtD(d)}. A Superior room is ${inr(rateFor('Superior',d))} a night. Want me to check it?`;
+  }
+  return 'I have passed this to the front desk. They will reply on WhatsApp within 5 minutes.';
+}
+function ask(q){
+  msgs.push({r:'me',t:q});
+  const log=$('#log');
+  log.insertAdjacentHTML('beforeend',`<div class="msg me">${esc(q)}</div>`);
+  log.scrollTop=log.scrollHeight;
+  setTimeout(()=>{
+    const a=answer(q);msgs.push({r:'bot',t:a});
+    const l=$('#log');if(l){l.insertAdjacentHTML('beforeend',`<div class="msg bot">${esc(a)}</div>`);l.scrollTop=l.scrollHeight;}
+  },650);
+}
+
+/* ---------- property switcher ---------- */
+$('#prop').addEventListener('change',e=>{
+  propName=e.target.value;msgs=[];
+  toast(`Showing demo data for ${propName}`);
+  if(tab==='ai')renderMod();
+});
+
+/* ---------- savings calculator ---------- */
+function roi(){
+  const rooms=+$('#r-rooms').value,adr=+$('#r-adr').value,o=+$('#r-occ').value,ota=+$('#r-ota').value;
+  $('#o-rooms').textContent=rooms;$('#o-adr').textContent=inr(adr);$('#o-occ').textContent=o+'%';$('#o-ota').textContent=ota+'%';
+  const rev=rooms*adr*(o/100)*30;
+  const comm=rev*(ota/100)*0.18;
+  const direct=rev*(Math.min(15,ota)/100)*0.18;
+  const err=rev*0.015;
+  $('#roi-rev').textContent=inr(rev);$('#roi-comm').textContent=inr(comm);
+  $('#roi-direct').textContent=inr(direct);$('#roi-err').textContent=inr(err);
+  $('#roi-total').textContent=inr(direct+err);
+}
+['#r-rooms','#r-adr','#r-occ','#r-ota'].forEach(s=>$(s).addEventListener('input',roi));
+
+/* ---------- contact (demo only: connect to your backend or WhatsApp link) ---------- */
+$('#c-send').addEventListener('click',()=>{
+  const n=$('#c-name').value.trim(),h=$('#c-hotel').value.trim(),p=$('#c-phone').value.trim();
+  $('#c-ok').textContent='';
+  if(!n||!h||p.replace(/\D/g,'').length<10){$('#c-err').textContent='Add your name, hotel name and a 10-digit WhatsApp number.';return;}
+  $('#c-err').textContent='';
+  $('#c-ok').textContent=`Thanks, ${n}. We will message ${p} to set up your demo for ${h}.`;
+  toast('Demo request sent');
+});
+
+/* ---------- start ---------- */
+roi();renderAll();renderMod();
+setTimeout(()=>$('#tape').classList.remove('intro'),1800);
+})();
+</script>
+</body>
+</html>
